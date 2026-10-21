@@ -23,6 +23,7 @@
   //#define MARAUDER_V7_1
   //#define MARAUDER_KIT
   //#define GENERIC_ESP32
+  //#define SHADOW_CLIENT_ESP32
   //#define MARAUDER_FLIPPER
   //#define MARAUDER_MULTIBOARD_S3
   //#define ESP32_LDDB
@@ -90,6 +91,8 @@
     #define HARDWARE_NAME "Marauder v7.1"
   #elif defined(MARAUDER_REV_FEATHER)
     #define HARDWARE_NAME "Adafruit Feather ESP32-S2 Reverse TFT"
+  #elif defined(SHADOW_CLIENT_ESP32)
+    #define HARDWARE_NAME "Shadow Client"
   #elif defined(MARAUDER_V4)
     #define HARDWARE_NAME "Marauder v4"
   #elif defined(MARAUDER_V6)
@@ -171,6 +174,11 @@
       defined(MARAUDER_M5STICKCP2) || defined(MARAUDER_MINI) || \
       defined(MARAUDER_REV_FEATHER)
     #define HAS_CSI_BUTTON_CONTROLS
+  #endif
+
+  #if defined(SHADOW_CLIENT_ESP32)
+    #define HAS_SCREEN
+    #define HAS_MINI_SCREEN
   #endif
 
   #if defined(MARAUDER_M5STICKC) || defined(MARAUDER_M5STICKCP2)
@@ -1079,6 +1087,49 @@
 
   //// DISPLAY DEFINITIONS
   #ifdef HAS_SCREEN
+
+    #ifdef SHADOW_CLIENT_ESP32
+      // ESP32 DevKit + 1.8 inch ST7735 red-tab, native 128x160 portrait.
+      #define CHAN_PER_PAGE 7
+      #define SCREEN_CHAR_WIDTH 21
+      #define TFT_MISO 19
+      #define TFT_MOSI 23
+      #define TFT_SCLK 18
+      #define TFT_CS 5
+      #define TFT_DC 2
+      #define TFT_RST 4
+      #define TFT_BL -1 // Backlight is wired directly to 3.3V.
+      #define TOUCH_CS -1
+      #define SCREEN_BUFFER
+      #define MAX_SCREEN_BUFFER 9
+      #define BANNER_TEXT_SIZE 1
+      #ifndef TFT_WIDTH
+        #define TFT_WIDTH 128
+      #endif
+      #ifndef TFT_HEIGHT
+        #define TFT_HEIGHT 160
+      #endif
+      #define GRAPH_VERT_LIM (TFT_WIDTH / 2 - 1)
+      #define EXT_BUTTON_WIDTH 0
+      #define SCREEN_ORIENTATION 1
+      #define CHAR_WIDTH 6
+      #define SCREEN_WIDTH TFT_HEIGHT
+      #define SCREEN_HEIGHT TFT_WIDTH
+      #define HEIGHT_1 TFT_WIDTH
+      #define WIDTH_1 TFT_WIDTH
+      #define STANDARD_FONT_CHAR_LIMIT (TFT_HEIGHT / 6)
+      #define TEXT_HEIGHT 8
+      #define BOT_FIXED_AREA 0
+      #define TOP_FIXED_AREA 20
+      #define YMAX TFT_WIDTH
+      #define minimum(a,b) (((a) < (b)) ? (a) : (b))
+      #define MENU_FONT &FreeMono9pt7b
+      #define BUTTON_SCREEN_LIMIT 6
+      #define BUTTON_ARRAY_LEN BUTTON_SCREEN_LIMIT
+      #define STATUS_BAR_WIDTH 8
+      #define LVGL_TICK_PERIOD 6
+      #define STATUSBAR_COLOR TFT_BLACK
+    #endif
 
     #ifdef MARAUDER_M5STICKC
       #define CHAN_PER_PAGE 7

@@ -1,5 +1,10 @@
 #include "CommandLine.h"
 
+#if defined(SHADOW_CLIENT_ESP32)
+extern void shadowWebStart();
+extern void shadowWebStop();
+#endif
+
 // GCOVR_EXCL_START -- serial protocol output depends on Arduino Serial.
 namespace {
   bool parseFiniteNumber(const String& value, double& parsed) {
@@ -60,7 +65,11 @@ void CommandLine::RunSetup() {
   #endif
 
   Serial.println(F("\n\n--------------------------------\n"));
-  Serial.println(F("         ESP32 Marauder      \n"));
+  #if defined(SHADOW_CLIENT_ESP32)
+    Serial.println(F("          Shadow Client      \n"));
+  #else
+    Serial.println(F("         ESP32 Marauder      \n"));
+  #endif
   Serial.println("            " + version_number + "\n");
   Serial.println(F("       By: justcallmekoko\n"));
   Serial.println(F("--------------------------------\n\n"));
@@ -270,11 +279,25 @@ void CommandLine::runCommand(String input) {
     Serial.println("#" + input);
 
   LinkedList<String> cmd_args = this->parseCommand(input, " ");
+
+  #if defined(SHADOW_CLIENT_ESP32)
+    if (cmd_args.get(0) == "shadowweb") {
+      if (cmd_args.size() > 1 && cmd_args.get(1) == "stop") {
+        shadowWebStop();
+      } else {
+        shadowWebStart();
+      }
+      return;
+    }
+  #endif
   
   //// Admin commands
   // Help
   if (cmd_args.get(0) == HELP_CMD) {
     Serial.println(HELP_HEAD);
+    #if defined(SHADOW_CLIENT_ESP32)
+      Serial.println(F("shadowweb [stop] - start/stop the local display-only web console"));
+    #endif
     Serial.println(HELP_CH_CMD);
     Serial.println(HELP_SETTINGS_CMD);
     Serial.println(HELP_GEOFENCE_CMD);

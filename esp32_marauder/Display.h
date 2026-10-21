@@ -24,6 +24,9 @@
 
 // Reject board/display configuration mismatches at compile time. A mismatched
 // TFT setup can boot normally while driving the wrong controller and pins.
+#if defined(SHADOW_CLIENT_ESP32) && (!defined(ST7735_DRIVER) || !defined(ST7735_REDTAB))
+  #error "SHADOW_CLIENT_ESP32 requires User_Setup_shadow_client.h with ST7735_REDTAB"
+#endif
 #if defined(MARAUDER_CYD_3_5_INCH) && !defined(ST7796_DRIVER)
   #error "MARAUDER_CYD_3_5_INCH requires User_Setup_cyd_3_5_inch.h (ST7796_DRIVER)"
 #endif

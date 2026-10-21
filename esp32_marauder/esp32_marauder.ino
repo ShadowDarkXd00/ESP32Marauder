@@ -43,6 +43,10 @@ https://www.online-utility.org/image/convert/to/XBM
 #endif
 #include "lang_var.h"
 
+#if defined(SHADOW_CLIENT_ESP32)
+  #include "ShadowWebUI.h"
+#endif
+
 #ifdef HAS_T_DONGLE_DISPLAY
   #include "TDongleDisplay.h"
 #endif
@@ -219,7 +223,9 @@ uint32_t currentTime  = 0;
 #else
   void backlightOn() {
     #ifdef HAS_SCREEN
-      #if defined(MARAUDER_MINI) || defined(MARAUDER_MINI_V3)
+      #if defined(SHADOW_CLIENT_ESP32)
+        // Backlight is wired directly to the 3.3V rail on this build.
+      #elif defined(MARAUDER_MINI) || defined(MARAUDER_MINI_V3)
         digitalWrite(TFT_BL, LOW);
       #elif !defined(MARAUDER_POOM)
         digitalWrite(TFT_BL, HIGH);
@@ -229,7 +235,9 @@ uint32_t currentTime  = 0;
 
   void backlightOff() {
     #ifdef HAS_SCREEN
-      #if defined(MARAUDER_MINI) || defined(MARAUDER_MINI_V3)
+      #if defined(SHADOW_CLIENT_ESP32)
+        // Backlight is wired directly to the 3.3V rail on this build.
+      #elif defined(MARAUDER_MINI) || defined(MARAUDER_MINI_V3)
         digitalWrite(TFT_BL, HIGH);
       #elif !defined(MARAUDER_POOM)
         digitalWrite(TFT_BL, LOW);
@@ -272,7 +280,7 @@ void setup()
     digitalWrite(POWER_HOLD_PIN, HIGH);
   #endif
   
-  #if defined(HAS_SCREEN) && !defined(MARAUDER_POOM)
+  #if defined(HAS_SCREEN) && !defined(MARAUDER_POOM) && !defined(SHADOW_CLIENT_ESP32)
     pinMode(TFT_BL, OUTPUT);
   #endif
   
@@ -453,6 +461,9 @@ void loop()
 
   // Update all of our objects
   cli_obj.main(currentTime);
+  #if defined(SHADOW_CLIENT_ESP32)
+    shadowWebLoop();
+  #endif
   wifi_scan_obj.main(currentTime);
   recon_obj.main(currentTime);
   #if defined(HAS_CSI_MOTION)
@@ -476,7 +487,11 @@ void loop()
   if ((wifi_scan_obj.currentScanMode != WIFI_PACKET_MONITOR) ||
       (mini)) {
     #ifdef HAS_SCREEN
-      menu_function_obj.main(currentTime);
+      #if defined(SHADOW_CLIENT_ESP32)
+        if (!shadowWebDisplayActive()) menu_function_obj.main(currentTime);
+      #else
+        menu_function_obj.main(currentTime);
+      #endif
     #endif
   }
   #ifdef HAS_FLIPPER_LED

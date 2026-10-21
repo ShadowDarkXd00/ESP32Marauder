@@ -288,6 +288,18 @@ void Display::RunSetup() {
 void Display::drawBootSplash() {
   const int16_t width = tft.width();
   const int16_t height = tft.height();
+  #if defined(SHADOW_CLIENT_ESP32)
+    tft.fillScreen(TFT_BLACK);
+    tft.setTextWrap(false);
+    tft.setTextColor(TFT_CYAN, TFT_BLACK);
+    tft.drawCentreString("SHADOW CLIENT", width / 2, 34, 2);
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.drawCentreString(version_number, width / 2, 62, 2);
+    tft.setTextColor(TFT_GREEN, TFT_BLACK);
+    tft.drawCentreString("Starting...", width / 2, 92, 1);
+    tft.setTextSize(1);
+    return;
+  #endif
   #ifdef MARAUDER_POOM
     tft.fillScreen(TFT_BLACK);
     tft.setTextWrap(false);
